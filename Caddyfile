@@ -1,0 +1,28 @@
+{
+  http_port 8080
+}
+
+:8080 {
+  root * /app/public
+  encode gzip zstd
+
+  # Fichiers statiques
+  @static {
+    file
+  }
+  handle @static {
+    file_server
+  }
+
+  # Requêtes Symfony / API
+  handle {
+    php_server
+  }
+
+  # Headers de sécurité
+  header {
+    X-Frame-Options "SAMEORIGIN"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+}

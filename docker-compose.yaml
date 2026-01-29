@@ -1,0 +1,52 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: mybien_app
+    volumes:
+      - ./app:/app
+    ports:
+      - "8001:8080"
+    env_file:
+      - .env.docker
+    environment:
+      APP_ENV: dev
+      SERVER_NAME: :8080
+      CADDY_MERCURE: "off"
+      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: mybien_db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: mybien
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mybien_db:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      - PMA_HOST=mybien_db
+      - UPLOAD_LIMIT=64M
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mybien_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  mybien_db:
