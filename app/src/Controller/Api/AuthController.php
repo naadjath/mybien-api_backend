@@ -15,5 +15,14 @@ final class AuthController extends AbstractController
             'message' => 'API Auth OK',
         ]);
     }
+
+    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+     public function register(): Response
+    {
+             // C'est ici que tu mettras la logique d'inscription plus tard
+        return $this->json([
+            'message' => 'Route Register OK !'
+        ]);
+    }
 }
 
