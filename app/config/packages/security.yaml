@@ -16,9 +16,30 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
-        main:
-            lazy: true
+
+        # LOGIN JWT (PUBLIC)
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+
+        # API PROTÉGÉE
+        api:
+            pattern: ^/api
+            stateless: true
             provider: app_user_provider
+            jwt: ~
+
+
+          # main:
+          #  lazy: true
+           # provider: app_user_provider
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -27,9 +48,20 @@ security:
             # switch_user: true
 
     # Note: Only the *first* matching rule is applied
+    
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+
+        # routes publiques
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+
+        # routes par rôle
+        - { path: ^/api/admin, roles: ROLE_ADMIN }
+        - { path: ^/api/proprietaire, roles: ROLE_PROPRIETAIRE }
+        - { path: ^/api/locataire, roles: ROLE_LOCATAIRE }
+
+        # tout le reste nécessite un token
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
@@ -37,7 +69,16 @@ when@test:
             # Password hashers are resource-intensive by design to ensure security.
             # In tests, it's safe to reduce their cost to improve performance.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
+                algorithm: bcrypt
+                cost: 12 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+
+            #Hierachie des roles 
+        role_hierarchy:
+        ROLE_ADMIN: [ROLE_PROPRIETAIRE, ROLE_LOCATAIRE, ROLE_USER]
+        ROLE_PROPRIETAIRE: [ROLE_USER]
+        ROLE_LOCATAIRE: [ROLE_USER]
+
+
+
