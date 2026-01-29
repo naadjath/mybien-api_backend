@@ -1,2 +1,14 @@
+
+# Environments
 .env
 .env.local
+.env.dev
+
+# JWT keys (NEVER commit)
+app/config/jwt/*.pem
+
+# Vendor
+/vendor/
+
+# Cache & logs
+/var/
