@@ -54,6 +54,7 @@ security:
         # routes publiques
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/test, roles: PUBLIC_ACCESS }
 
         # routes par rôle
         - { path: ^/api/admin, roles: ROLE_ADMIN }
@@ -75,7 +76,7 @@ when@test:
                 memory_cost: 10 # Lowest possible value for argon
 
             #Hierachie des roles 
-        role_hierarchy:
+    role_hierarchy:
         ROLE_ADMIN: [ROLE_PROPRIETAIRE, ROLE_LOCATAIRE, ROLE_USER]
         ROLE_PROPRIETAIRE: [ROLE_USER]
         ROLE_LOCATAIRE: [ROLE_USER]
